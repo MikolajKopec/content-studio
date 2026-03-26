@@ -1,0 +1,12 @@
+{
+  "name": "content-studio",
+  "version": "1.0.0",
+  "description": "Create quality content — short/long video scripts, social media posts, articles, and repurpose across formats. Built on proven frameworks from Kallaway, Hormozi, MrBeast, Film Booth, and behavioral science.",
+  "author": {
+    "name": "Mikołaj Kopeć",
+    "url": "https://github.com/MikolajKopec"
+  },
+  "repository": "https://github.com/MikolajKopec/content-studio",
+  "license": "MIT",
+  "keywords": ["content", "video", "script", "social-media", "copywriting", "tiktok", "youtube", "linkedin"]
+}
