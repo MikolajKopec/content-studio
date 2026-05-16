@@ -1,0 +1,13 @@
+{
+  "name": "content-studio",
+  "owner": {
+    "name": "Mikołaj Kopeć"
+  },
+  "plugins": [
+    {
+      "name": "content-studio",
+      "source": ".",
+      "description": "Create quality content — short/long video scripts, social media posts, articles, and repurpose across formats. Includes /short interactive Polish short-form script generator."
+    }
+  ]
+}
