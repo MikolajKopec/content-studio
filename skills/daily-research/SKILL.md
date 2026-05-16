@@ -163,15 +163,53 @@ Pass to sub-agent (inline):
 
 ### Step 4 — Sub-agent return
 
-Sub-agent returns ONE of:
-- `OK: notatka.md saved at shorts/{TODAY}/{slug}/notatka.md ({size} bytes)`
-- `FAIL: {1-sentence reason}`
+Sub-agent returns a **structured RESULT block** (see `subagent.md` for the full format). Parse it to extract:
+- `status` (OK | FAIL)
+- `slug`, `headline`, `tldr`, `hook_1/2/3`, `potencjal`
 
-**Main agent does NOT read the full notatka.md content** — it's on disk for later use. Just track success/failure count.
+**Main agent does NOT read the full notatka.md content** — it's on disk for later use. Keep all parsed RESULT blocks in memory (cheap, ~500 bytes each) for use in Step 5.
 
 ### Parallelism
 
 Dispatch sub-agents **sequentially** by default (one at a time) for safety. If your environment supports parallel Task dispatch, max **3 in flight** at once.
+
+### Step 5 — Generate SUMMARY.md (after ALL sub-agents finish)
+
+**Idempotency:** if `shorts/{TODAY}/SUMMARY.md` already exists → skip this step.
+
+Otherwise, write `shorts/{TODAY}/SUMMARY.md` aggregating all OK results:
+
+```markdown
+# Skrót dnia — {DATE_PL}
+
+{N} newsów researched. Cherry-pick poniżej.
+
+---
+
+## 1. {headline_1}
+
+📂 [`{slug_1}/notatka.md`](./{slug_1}/notatka.md)
+**Potencjał:** {emoji_1} {potencjal_1}
+
+**TL;DR:** {tldr_1}
+
+**Top hooks:**
+- {hook_1_1}
+- {hook_1_2}
+- {hook_1_3}
+
+---
+
+## 2. ...
+```
+
+Where:
+- `{DATE_PL}` — Polish date format like "17 maja 2026"
+- `{emoji}` — 🔥 for wysoki, ⚡ for średni, 💧 for niski
+- Order topics by potential (wysoki first, then średni, then niski) for easy cherry-pick
+- Include ONLY status=OK results. FAIL ones get a short "## ❌ Failed topics" section at the bottom if any.
+
+If all sub-agents failed → write SUMMARY.md with just header + "Wszystkie sub-agenty padły — sprawdź logi".
 
 ---
 
@@ -188,7 +226,7 @@ If no changes → print FINAL REPORT with "No new content today" and exit clean 
 Otherwise:
 ```bash
 git add news/{TODAY}/ shorts/{TODAY}/
-git commit -m "Daily content prep {TODAY} — {N} newsów, {M} notatek"
+git commit -m "Daily content prep {TODAY} — {N} newsów, {M} notatek + SUMMARY.md"
 git pull --rebase --autostash origin main
 git push origin main
 ```
@@ -210,11 +248,12 @@ Where `{N}` = item count in newsy.md, `{M}` = number of notatka.md files created
 
 ```
 === DAILY CONTENT REPORT {TODAY} ===
-Stage 1 (newsy.md): {N items written | skipped — file already existed}
-Stage 2 (notatki):  {M created | K skipped (already existed) | F failed}
-Stage 3 (git):      {SUCCESS | FAIL: <reason>}
-Total runtime:      {minutes}
-Notable issues:     {empty search results | sub-agent failures | etc.}
+Stage 1 (newsy.md):  {N items written | skipped — file already existed}
+Stage 2 (notatki):   {M created | K skipped (already existed) | F failed}
+Stage 2.5 (SUMMARY): {created | skipped — already existed}
+Stage 3 (git):       {SUCCESS | FAIL: <reason>}
+Total runtime:       {minutes}
+Notable issues:      {empty search results | sub-agent failures | etc.}
 =========================================
 ```
 

@@ -98,9 +98,36 @@ Examples of good hooks (from past well-performing content):
 
 ## Return value to parent
 
-Return **exactly one** of these strings (no other text):
+Return a **structured block** in this exact format (parent will parse it to build SUMMARY.md):
 
-- `OK: notatka.md saved at shorts/{TODAY}/{slug}/notatka.md ({size} bytes)`
-- `FAIL: {1-sentence reason}`
+```
+=== RESULT ===
+status: OK
+slug: {slug}
+headline: {the H2 headline}
+size: {file size in bytes}
+potencjal: {wysoki | średni | niski}
+tldr: {1-2 sentences, punchy, what's the story in plain Polish}
+hook_1: {top hook from "Potencjalne kąty narracyjne", verbatim}
+hook_2: {second-best hook, verbatim}
+hook_3: {third-best hook, verbatim}
+=== END RESULT ===
+```
 
-Parent agent will track success/failure counts and report in FINAL REPORT.
+If something failed:
+
+```
+=== RESULT ===
+status: FAIL
+slug: {slug}
+reason: {1-sentence reason}
+=== END RESULT ===
+```
+
+**Rules for the structured block:**
+- TL;DR: must be self-contained — viewer reads only this and gets the gist
+- Pick the 3 strongest hooks from your "Potencjalne kąty narracyjne" section (most concrete numbers, biggest drama, most counterintuitive)
+- Hooks should be VERBATIM from the section — don't paraphrase
+- `potencjal`: assess based on viral potential for meeko.tech audience (concrete numbers, big firms, drama, lawsuits, PL bonus → wysoki)
+
+Parent agent will track success/failure counts AND aggregate the result blocks into `shorts/{TODAY}/SUMMARY.md` (dashboard for cherry-picking topics later).
