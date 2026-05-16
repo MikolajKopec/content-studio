@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+LaunchAgent for daily content research pipeline.
+
+Install:
+  cp scripts/com.user.daily-research.plist ~/Library/LaunchAgents/
+  launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.user.daily-research.plist
+
+Manual fire (test):
+  launchctl kickstart -k gui/$(id -u)/com.user.daily-research
+
+Unload:
+  launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.user.daily-research.plist
+
+Schedule:
+  07:00 every day (Mac local time = Europe/Warsaw). launchd handles DST automatically.
+  If Mac is off at 07:00, launchd runs the job ASAP after wake (RunAtLoad=false but missed
+  jobs are re-fired by default for StartCalendarInterval).
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.daily-research</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/quba/content-studio/scripts/daily-research.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>7</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/quba/content-studio</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/quba</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/quba/Library/Logs/daily-research.launchd.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/quba/Library/Logs/daily-research.launchd.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
