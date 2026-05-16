@@ -87,6 +87,16 @@ People share content for what it says about THEM, not about the content itself.
 | **Direct command** | Authority + interrupt | "Stop. What I'm about to tell you will change how you do [X]." |
 | **Bizarre** | Bizarreness effect + curiosity | "[ABSURD STATEMENT]. And I'm serious." |
 
+## Schwartz Awareness Levels (Eugene Schwartz)
+
+| Level | Audience State | Best Framework |
+|-------|---------------|----------------|
+| Unaware | Don't know they have a problem | Storytelling, controversy, curiosity |
+| Problem-aware | Know the problem, not the solution | PAS, SCQA, BAB |
+| Solution-aware | Know solution types, not yours | How-to, comparisons, lists |
+| Product-aware | Know you, not convinced | Social proof, case study |
+| Most aware | Ready to act | Direct CTA, offer |
+
 ## Pattern Interrupts
 
 The brain filters repetitive stimuli (habituation). Unexpected stimulus forces attention shift, activates amygdala, increases dopamine.
