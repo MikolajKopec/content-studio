@@ -13,12 +13,14 @@ Before writing, collect from the user:
 
 1. **Topic** — what is the video about?
 2. **Platform** — TikTok, Reels, or YouTube Shorts (affects tone and style)
-3. **Length** — 15s, 30s, 60s, or 90s
+3. **Length** — 15s, 30s, or 40s (HARD MAX: 40 seconds)
 4. **Content type** — educational/how-to, storytelling, insight/opinion, listicle, or product/service
 5. **Target audience** — who is this for?
 6. **CTA goal** (optional) — follow, save, comment, link in bio, or part of a series
 
-If the user doesn't specify, default to: 60s, educational, platform-agnostic.
+If the user doesn't specify, default to: 40s, educational, platform-agnostic.
+
+**IMPORTANT:** Shorts MUST NOT exceed 40 seconds. If the topic seems to need more, cut scope — pick one angle, drop the rest.
 
 ## Step 2: Choose Framework
 
@@ -29,11 +31,9 @@ Based on content type and length, select the primary framework:
 | 15s | Any | PAS Micro |
 | 30s | Educational | PAS + Proof |
 | 30s | Story | Situation Hook + mini-arc |
-| 60s | Educational | Hormozi Formula |
-| 60s | Story | But/Therefore + Last Dab |
-| 60s | Opinion | Contrarian Hook + 3 Arguments |
-| 90s | Any story | Full Story Arc |
-| 90s | Educational | Mini-Essay |
+| 40s | Educational | Hormozi Compact |
+| 40s | Story | But/Therefore + Last Dab (compact) |
+| 40s | Opinion | Contrarian Hook + 2 Arguments |
 
 → *Consult [frameworks reference](reference/frameworks.md) for detailed templates*
 
@@ -55,35 +55,23 @@ Based on content type and length, select the primary framework:
 [27-30s] CTA
 ```
 
-**60s — Hormozi Formula:**
+**40s — Hormozi Compact (MAX LENGTH):**
 ```
-[0-2s]  BOLD CLAIM: "Here's how to [result] in [timeframe]"
-[2-8s]  CREDIBILITY: "I did this with [proof]"
-[8-45s] FRAMEWORK: "Step 1... Step 2... Step 3..." (ultra-specific)
-[45-55s] REFRAME: "Most people think [X], but actually [Y]"
-[55-60s] CTA: Implied
+[0-2s]  BOLD CLAIM: "Here's how to [result]"
+[2-6s]  CREDIBILITY: "I tested it with [proof]"
+[6-28s] FRAMEWORK: "Step 1... Step 2..." (max 2-3 ultra-specific steps)
+[28-35s] REFRAME: "Most people think [X], but actually [Y]"
+[35-40s] CTA / loop
 ```
 
-**60s — But/Therefore Story:**
+**40s — But/Therefore Story (MAX LENGTH):**
 ```
 [0-3s]  HOOK — strong opening statement or question
-[3-10s] SETUP — "I was doing [X]..."
-[10-20s] BUT — "But then [conflict]..."
-[20-35s] THEREFORE — "So I [action]..."
-[35-50s] BUT/THEREFORE cascade — escalation
-[50-57s] LAST DAB — punchline that loops with opening
-[57-60s] CTA or loop restart
-```
-
-**90s — Full Story Arc:**
-```
-[0-3s]  HOOK — in medias res
-[3-15s] SETUP — quick essential backstory
-[15-25s] RISING TENSION — "But then..." / conflict
-[25-50s] DEVELOPMENT — journey/process/steps
-[50-70s] CLIMAX — result, revelation, transformation
-[70-85s] RESOLUTION — what it means / lesson
-[85-90s] CTA
+[3-8s]  SETUP — "I was doing [X]..."
+[8-16s] BUT — "But then [conflict]..."
+[16-28s] THEREFORE — "So I [action]..." + escalation
+[28-35s] LAST DAB — punchline that loops with opening
+[35-40s] CTA or loop restart
 ```
 
 ## Step 3: Write the Hook (Most Critical)
