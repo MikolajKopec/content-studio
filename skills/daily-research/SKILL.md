@@ -30,12 +30,29 @@ Three sequential stages. **Idempotent** (resume from last successful step).
 
 ## Stage 1 — News Scrape
 
-### Time anchor
+### Time anchor — HARD constraint
 
 Routine runs at 07:00 local (Europe/Warsaw) daily.
-Target window: news published between **(TODAY − 1) 00:00 UTC** and **TODAY 05:00 UTC** (~29h).
+Target window: news published between **(TODAY − 2) 00:00 UTC** and **TODAY 05:00 UTC** (~53h, gives slack for late-evening breaking stories from the prior day).
 
-When WebSearch results lack explicit dates, treat as candidates but verify timestamps before including.
+**This is a hard reject criterion, not a preference.** A great tools-first story from a week ago is NOT a daily-research item — it's evergreen content and belongs elsewhere. Pipeline output must feel like *today's* news, not a "best tools released this month" digest.
+
+**Date verification step (mandatory, run FIRST before actionable angle test):**
+
+For every candidate, before including in newsy.md:
+1. Open the primary source (or check WebSearch result metadata) for the **publication date of the actual announcement/release** — not "as of today" wrappers or aggregator re-posts.
+2. If publication date is **>48h before TODAY (UTC)** → **REJECT**, no exceptions, even if perfect tools-first match.
+3. If date is ambiguous ("May 2026", "this week", "recently") → **REJECT** unless you can find a primary source pinning it to within the window.
+4. Re-runs / re-announcements of older items (e.g., "X is now also on Bedrock" when X launched 3 weeks ago) → reject the X story, but the *Bedrock availability* itself can be the news if it's within window.
+
+### Less-is-more rule
+
+If after date filtering you have fewer than 6 strong tools-first candidates, **publish fewer items**. Acceptable counts:
+- **3-5 items**: fine if all are fresh + actionable. Mark as "Quiet news day" in the file header.
+- **6-10 items**: normal day.
+- **<3 items**: still commit, but flag in the FINAL REPORT — likely a holiday / weekend with no major releases.
+
+**Never pad with stale releases just to hit 6.** A 3-item day of fresh narzędziowe news beats an 8-item day of mostly evergreen.
 
 ### Idempotency
 
@@ -45,60 +62,82 @@ If `news/{TODAY}/newsy.md` already exists with ≥3 items → **skip Stage 1**, 
 
 Use **WebSearch only** in main agent context (NOT WebFetch — that goes to sub-agents in Stage 2).
 
-Run 6-8 parallel searches covering verticals. Query in **English** (more sources, fresher). Suggested:
+Run 6-8 parallel searches covering verticals. Query in **English** (more sources, fresher). **Embed the actual date or "today" / "this week" in queries** — generic month/year queries pull last month's evergreen content. Bias queries toward **"released / available / launched / shipping / free tier"** keywords — not "announced / unveiled / plans to". Suggested patterns (substitute `{TODAY}` with the actual ISO date e.g., 2026-05-17, `{YESTERDAY}` similarly):
 
-1. `AI announcement {month name} {year}` (e.g., "AI announcement May 2026")
-2. `humanoid robot news 2026`
-3. `Apple Google OpenAI Anthropic news today`
-4. `smartphone launch {month name} 2026`
-5. `Cursor Antigravity Claude Code IDE update`
-6. `Polish AI Bielik news` (PL bonus)
-7. `Tesla Optimus Figure NEO robot demo`
-8. `AI consumer app launch {month name} {year}`
+1. `AI model released this week download {YESTERDAY}` — vertical 1 (tools to try)
+2. `smartphone launched today price release {YESTERDAY} {TODAY}` — vertical 2
+3. `ChatGPT Gemini new feature today rolled out {YESTERDAY}` — vertical 3
+4. `Cursor Antigravity Claude Code update {YESTERDAY} {TODAY}` — vertical 4
+5. `humanoid robot demo {YESTERDAY} this week` — vertical 5 (1/day cap)
+6. `Bielik polski AI release tym tygodniu {YESTERDAY}` — PL bonus
+7. `Apple iOS update available {YESTERDAY} this week` — vertical 3
+8. `open weights HuggingFace Ollama release this week {YESTERDAY}` — vertical 1
 
-Adapt queries to actual events — if you spot a major news cycle, drill into it.
+**Anti-queries** (avoid these patterns — they pull business drama):
+- ❌ "IPO" / "valuation" / "raises $X" / "funding round" (unless vertical 6 product hook)
+- ❌ "lawsuit" / "testifies" / "court filing" (unless product consequence)
+- ❌ "according to reports, plans to" / "coming in 2027" (roadmap-only)
+
+Adapt queries to actual events — if you spot a major release cycle (e.g., WWDC, Made by Google), drill into the **shipping features**, not the keynote narrative.
+
+### Core principle — TOOLS-FIRST, not newsroom
+
+This channel is **narzędziowe i przyziemne** — narzędziowe (tool-oriented) and grounded. The viewer should leave each short knowing about something they can **try, buy, download, or use within 1-2 weeks**. We are NOT Bloomberg. Valuations, IPOs, lawsuits, and leadership drama are *not* the point — they only count when attached to a concrete product/feature the viewer can touch.
 
 ### Verticals — INCLUDE
 
-1. **AI / new models from major firms** — Google, Apple, OpenAI, Anthropic, Meta, Xiaomi, NVIDIA, Mistral, + **Polish AI bonus** (Bielik, polskie modele)
-2. **Humanoid robotics** — Figure, Tesla Optimus, NEO, Atlas (Boston Dynamics), Unitree, Agility, Apptronik
-3. **Consumer hardware with drama/comparison angle** — phones (launches, copies, fight), laptops (Apple M-series especially), gaming devices (Steam Machine, Switch), AR/VR
-4. **Dev tools / Agentic IDE wars** — Cursor, Antigravity, Claude Code, Copilot, new AI dev tools
-5. **AI reaching mainstream** — apps integrating AI (ChatGPT mobile features, InPost+Bielik-style integrations), consumer-facing agents
+1. **AI tools to try TODAY** — open-weight models (HuggingFace, Ollama, LM Studio), new AI apps/services with free tier or public beta, GA releases (paid or free). **Requirement:** an actual access path exists on the day of the news (download link, App Store, web app, waitlist with date). "Announced, ships next year" → exclude.
 
-### Verticals — CONDITIONAL (only with viral hook)
+2. **Consumer hardware to buy** — phones, laptops, AR/VR, wearables, AI gadgets, gaming devices. **Requirement:** at least one of: confirmed sale date (within 90 days), pre-order open, official price (USD/EUR/PLN). Prefer products with PL availability or price context. "Concept reveal, no date/price" → exclude.
 
-6. **Big Tech business** — acquisitions, valuations, funding, leadership changes, lawsuits. **Include ONLY IF one of:**
-   - Specific big number (>$1B funding/valuation/ARR)
-   - Public drama / lawsuit / fight
-   - Counterintuitive deal (e.g., "Apple pays competitor $1B")
+3. **Features in apps people actually use** — ChatGPT, Gemini app, Gmail, iOS/iPadOS, Android, Spotify, banking apps (PSD2 / Open Banking), Telegram, WhatsApp, InPost, Allegro, mObywatel, Microsoft 365, Notion. **Requirement:** feature is rolling out now or has a concrete start date — not a vague "later this year".
 
-   Plain "deal closed" without hook → **exclude**.
+4. **Dev tools / Agentic IDE wars** — Cursor, Antigravity, Claude Code, Copilot, Codex CLI, MCP servers, Windsurf, new AI dev tools. Devs use these = inherently narzędziowe. Includes pricing/limit changes (free tier shrinks, new plan tiers).
 
-### Verticals — EXCLUDE (proven poor performance)
+5. **Humanoid robotics** — Figure, Tesla Optimus, NEO, Atlas (Boston Dynamics), Unitree, Agility, Apptronik. **HARD LIMIT: max 1 robot story per day.** **Requirement:** either (a) demo showing a concrete new capability with metrics (e.g., "Figure 36h non-stop, 40k packages"), or (b) buyable product with price (e.g., Unitree G1 $16k OK; $650k mecha no — too abstract).
 
-- ❌ Crypto / fintech
+### Verticals — CONDITIONAL — Big Tech business **only if tied to product**
+
+6. **Acquisitions, funding, IPO, lawsuits, leadership shifts** — include **ONLY if BOTH apply**:
+   - Tied to a concrete consumer/tool outcome (a release, integration, price change, layoff affecting a product, deal that unlocks distribution)
+   - Viral hook: drama / counterintuitive / massive PL-relevant number
+
+   **Examples of include:** "Anthropic closes $50B — Claude Pro price doubles next month", "Cerebras IPO — chips now available via AWS Bedrock", "Musk lawsuit forces OpenAI to open-source model X".
+
+   **Examples of EXCLUDE (today's bad ones):** "Anthropic valued at $950B" alone, "Cerebras IPO +108%" with no product news, "Altman testified Musk wanted 90%" without product consequence.
+
+   Pure financial milestone with no tool/product touchpoint → **exclude**, even with big numbers. We are not CNBC.
+
+### Verticals — EXCLUDE (proven poor performance OR off-mission)
+
+- ❌ Crypto / fintech (zero precedent in 15 films)
 - ❌ Tech politics / regulations (EU AI Act, etc.) — too slow tempo
 - ❌ Academic AI research / arXiv papers — niche
 - ❌ How-to tutorials ("how to install X") — proven floppers
 - ❌ Pure social media features (Instagram, TikTok feature updates) — short half-life
+- ❌ **Pure business drama** — IPO, valuation, fundraising round, lawsuit, leadership shuffle WITHOUT a tied product/feature outcome
+- ❌ **Future-roadmap announcements** without release date, price, or open waitlist (e.g., "we'll launch X in 2027", "factory of the future in 24 months")
+- ❌ Conference keynote summaries without specific shipped/shipping items
 
-### Selection criteria
+### Selection criteria — actionable angle is mandatory
 
-For each candidate, must meet **≥1**:
-- Major company announcement
-- Concrete specific number ($/users/percent/hours)
-- New product launch or live demo
-- Public drama, comparison, lawsuit, or fight
-- Surprising contradiction / counterintuitive fact
+Each candidate must meet the **actionable angle test**:
 
-**Reject if:** niche library/framework, deeply technical without consumer angle, opinion/analysis without new info, sponsored content, rumor without source.
+> Can the viewer, within 1-2 weeks of watching, **download / buy / try / sign up for / measurably benefit from** what this news describes?
 
-### Target: 6-10 items
+If yes → include. If no → exclude unless it's a robot demo (vertical 5) or B2B dev tool (vertical 4) where the visual / professional angle compensates.
 
-If <6 strong candidates: include the best you have, mark weaker ones `**Potencjał contentowy:** niski` but don't pad with low-quality fillers.
+In addition, must meet **≥1** of:
+- **Actionable + concrete**: ship date, price, free tier limit, benchmark number tied to a working product
+- **Product comparison / drama** between things viewers know (Cursor vs Antigravity ✓; Anthropic vs OpenAI valuation ✗)
+- **New product launch or live demo** with metrics — preferably already in customers' hands or public beta
+- **Surprising fact about a working product** (not a roadmap, not a research paper)
 
-If >10: pick top 10 by potential.
+**Reject if:** niche library without UI, deeply technical without consumer/dev angle, opinion/analysis, sponsored content, rumor without source, "announced but ships in 12+ months", keynote roadmap without dates.
+
+### Target count
+
+See "Less-is-more rule" above. Normal day: 6-10 items. Quiet day: 3-5 is fine — just be fresh + actionable. If >10 strong candidates: pick top 10 by potential.
 
 ### Output format — `news/{TODAY}/newsy.md`
 
